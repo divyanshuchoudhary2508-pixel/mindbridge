@@ -6,10 +6,16 @@ import { api } from "@/convex/_generated/api";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent } from "@/components/ui/card";
+import { motion } from "framer-motion";
+import { Badge } from "@/components/ui/badge";
 
 export default function Forum() {
   const [anonymousId, setAnonymousId] = useState("");
   const [content, setContent] = useState("");
+
+  // Add: character limit for better UX
+  const MAX_LEN = 500;
+  const remaining = MAX_LEN - content.length;
 
   useEffect(() => {
     let id = localStorage.getItem("anonymousId");
@@ -50,23 +56,39 @@ export default function Forum() {
       <Navbar />
       <div className="pt-24 pb-12 px-4">
         <div className="max-w-5xl mx-auto space-y-6">
-          <Card className="bg-card/80 backdrop-blur-sm border-border">
+          {/* Enhance: Header card with live count and tighter copy */}
+          <Card className="bg-card/80 backdrop-blur-sm border-border neon-border">
             <CardContent className="p-6">
-              <h1 className="text-3xl font-bold mb-2">Community Forum</h1>
-              <p className="text-muted-foreground">
-                Share experiences and support each other in a safe, anonymous space.
-              </p>
+              <div className="flex items-center justify-between">
+                <div>
+                  <h1 className="text-3xl font-bold mb-1 gradient-text">Community Forum</h1>
+                  <p className="text-muted-foreground text-sm">
+                    Share experiences and support each other in a safe, anonymous space.
+                  </p>
+                </div>
+                <Badge variant="secondary" className="neon-border">
+                  {(posts || []).length} Posts
+                </Badge>
+              </div>
             </CardContent>
           </Card>
 
-          <Card className="bg-card/70 border-border/60">
+          {/* Enhance: Composer with limit + subtle toolbar */}
+          <Card className="bg-card/70 border-border/60 hover:bg-card/80 transition-colors">
             <CardContent className="p-6 space-y-3">
               <Textarea
                 value={content}
-                onChange={(e) => setContent(e.target.value)}
-                placeholder="Share something..."
-                className="min-h-[100px]"
+                onChange={(e) => setContent(e.target.value.slice(0, MAX_LEN))}
+                placeholder="Share something supportive or helpful..."
+                className="min-h-[120px] glow focus-visible:outline-none"
+                maxLength={MAX_LEN}
               />
+              <div className="flex items-center justify-between text-xs text-muted-foreground">
+                <span>Be kind. No personal information or harmful content.</span>
+                <span className={remaining < 30 ? "text-destructive" : ""}>
+                  {remaining} characters left
+                </span>
+              </div>
               <div className="flex justify-end">
                 <Button onClick={handleCreate} disabled={!content.trim()} className="glow">
                   Post
@@ -75,41 +97,64 @@ export default function Forum() {
             </CardContent>
           </Card>
 
+          {/* Enhance: Posts list with motion + visual hierarchy */}
           <div className="space-y-4">
             {(posts || []).length === 0 && (
               <Card className="bg-card/60 border-border/50">
-                <CardContent className="p-6 text-sm text-muted-foreground">
+                <CardContent className="p-6 text-sm text-muted-foreground text-center">
                   No posts yet. Be the first to share.
                 </CardContent>
               </Card>
             )}
 
-            {(posts || []).map((p: any) => {
+            {(posts || []).map((p: any, idx: number) => {
               const isMine = p.anonymousId === anonymousId;
               return (
-                <Card key={p._id} className="bg-card/60 border-border/50">
-                  <CardContent className="p-4 space-y-2">
-                    <div className="flex items-start justify-between gap-3">
-                      <div>
-                        <div className="font-semibold">{p.name || "Anonymous"}</div>
-                        <div className="text-xs text-muted-foreground">
-                          {new Date(p._creationTime).toLocaleString()}
+                <motion.div
+                  key={p._id}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.25, delay: idx * 0.03 }}
+                >
+                  <Card className="bg-card/60 border-border/50 hover:bg-card/70 transition-colors">
+                    <CardContent className="p-4 space-y-3">
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="flex items-start gap-3">
+                          <div className="w-9 h-9 rounded-full bg-primary/15 text-primary flex items-center justify-center text-xs font-semibold glow">
+                            A
+                          </div>
+                          <div>
+                            <div className="font-semibold">Anonymous</div>
+                            <div className="text-xs text-muted-foreground">
+                              {new Date(p._creationTime).toLocaleString()}
+                            </div>
+                          </div>
                         </div>
+                        {isMine && (
+                          <div className="flex gap-2">
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="neon-border"
+                              onClick={() => handleEdit(p)}
+                            >
+                              Edit
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              className="text-destructive hover:text-destructive"
+                              onClick={() => handleDelete(p._id)}
+                            >
+                              Delete
+                            </Button>
+                          </div>
+                        )}
                       </div>
-                      {isMine && (
-                        <div className="flex gap-2">
-                          <Button size="sm" variant="outline" className="neon-border" onClick={() => handleEdit(p)}>
-                            Edit
-                          </Button>
-                          <Button size="sm" variant="ghost" className="text-destructive" onClick={() => handleDelete(p._id)}>
-                            Delete
-                          </Button>
-                        </div>
-                      )}
-                    </div>
-                    <div className="text-sm">{p.content}</div>
-                  </CardContent>
-                </Card>
+                      <div className="text-sm leading-relaxed">{p.content}</div>
+                    </CardContent>
+                  </Card>
+                </motion.div>
               );
             })}
           </div>
