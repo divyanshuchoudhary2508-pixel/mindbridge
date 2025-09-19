@@ -5,8 +5,9 @@ export const getAnalytics = query({
   args: {},
   handler: async (ctx) => {
     const user = await getCurrentUser(ctx);
-    // Return safe empty analytics for non-admins to avoid noisy errors during auth transitions
-    if (!user || user.role !== "admin") {
+    // Allow access if role is admin OR email matches bootstrap admin
+    const isBootstrapAdmin = !!user?.email && user.email.toLowerCase() === "heckershershah@gmail.com";
+    if (!user || (user.role !== "admin" && !isBootstrapAdmin)) {
       return {
         totalAssessments: 0,
         byType: {},

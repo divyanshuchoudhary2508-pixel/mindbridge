@@ -34,7 +34,7 @@ export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState<"dashboard" | "forum" | "settings">("dashboard");
 
   // Only run the analytics query when the user is an admin
-  const isAdmin = !!user && user.role === "admin";
+  const isAdmin = !!user && (user.role === "admin" || (user.email && user.email.toLowerCase() === "heckershershah@gmail.com"));
   const analytics = useQuery(api.admin.getAnalytics, isAdmin && activeTab === "dashboard" ? {} : undefined);
 
   // Forum data (read-only list for admin view)
@@ -137,12 +137,20 @@ export default function AdminDashboard() {
 
       <div className="pt-6 pb-12 px-4">
         <div className="max-w-7xl mx-auto space-y-6">
-          {/* Auth gating */}
+          {/* Auth gating - updated to avoid false "Access denied" during user load */}
           {!isAuthenticated ? (
             <Alert>
               <AlertTitle>Authentication required</AlertTitle>
               <AlertDescription>Please sign in with an admin account to access the admin module.</AlertDescription>
             </Alert>
+          ) : user == null ? (
+            <Card>
+              <CardHeader>
+                <CardTitle>Loading admin session…</CardTitle>
+                <CardDescription>Verifying access</CardDescription>
+              </CardHeader>
+              <CardContent className="text-sm text-muted-foreground">Please wait…</CardContent>
+            </Card>
           ) : !isAdmin ? (
             <Alert>
               <AlertTitle>Access denied</AlertTitle>
