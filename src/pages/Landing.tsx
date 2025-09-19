@@ -25,6 +25,9 @@ import { toast } from "sonner";
 import CalmBackground from "@/components/CalmBackground";
 import Navbar from "@/components/Navbar";
 import EmergencyBar from "@/components/EmergencyBar";
+import LandingHero from "@/components/landing/LandingHero";
+import LandingFeatures from "@/components/landing/LandingFeatures";
+import LandingQuickActions from "@/components/landing/LandingQuickActions";
 
 export default function Landing() {
   const { isAuthenticated, user } = useAuth();
@@ -148,193 +151,13 @@ export default function Landing() {
         posterSrc="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=3840&q=100"
       >
         {/* Hero Section */}
-        <section className="pt-32 pb-20 px-4">
-          <div className="max-w-7xl mx-auto text-center">
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8 }}
-            >
-              <Badge variant="secondary" className="mb-6 neon-border">
-                <Heart className="h-3 w-3 mr-1" />
-                100% Anonymous & Free
-              </Badge>
-              
-              <h1 className="text-5xl md:text-7xl font-bold mb-6 gradient-text">
-                Mental Health Support
-              </h1>
-              
-              <p className="text-xl md:text-2xl text-muted-foreground mb-4 max-w-3xl mx-auto">
-                Discover Your Mental Health Score in Minutes
-              </p>
-              
-              <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto">
-                Quick, anonymous self-assessments with AI-powered support. 
-                Get personalized insights and connect with professional help when you need it.
-              </p>
-              
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Link to="/assessment">
-                  <Button size="lg" className="glow group">
-                    Get Started
-                    <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
-                  </Button>
-                </Link>
-                
-                <Link to="/chatbot">
-                  <Button variant="outline" size="lg" className="neon-border">
-                    <MessageCircle className="mr-2 h-5 w-5" />
-                    Talk to AI Assistant
-                  </Button>
-                </Link>
-              </div>
-            </motion.div>
-          </div>
-        </section>
+        <LandingHero />
 
         {/* Features Section */}
-        <section className="py-20 px-4">
-          <div className="max-w-7xl mx-auto">
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8 }}
-              className="text-center mb-16"
-            >
-              <h2 className="text-3xl md:text-4xl font-bold mb-4">
-                Why Choose Anonymous Aid?
-              </h2>
-              <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-                Professional-grade mental health tools designed with your privacy and well-being in mind.
-              </p>
-            </motion.div>
-
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {[
-                {
-                  icon: Shield,
-                  title: "100% Anonymous",
-                  description: "No registration required. Your privacy is our priority.",
-                  color: "text-primary"
-                },
-                {
-                  icon: Clock,
-                  title: "Quick Assessment",
-                  description: "Get your mental health score in just 5 minutes.",
-                  color: "text-accent"
-                },
-                {
-                  icon: Brain,
-                  title: "AI-Powered Support",
-                  description: "24/7 intelligent assistance with voice capabilities.",
-                  color: "text-secondary"
-                },
-                {
-                  icon: Users,
-                  title: "Professional Network",
-                  description: "Connect with licensed mental health professionals.",
-                  color: "text-primary"
-                }
-              ].map((feature, index) => (
-                <motion.div
-                  key={feature.title}
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.8, delay: index * 0.1 }}
-                >
-                  <Card className="h-full bg-card/50 backdrop-blur-sm border-border/50 hover:bg-card/70 transition-all duration-300 group">
-                    <CardContent className="p-6 text-center">
-                      <div className={`inline-flex p-3 rounded-lg bg-muted mb-4 group-hover:glow transition-all duration-300 ${feature.color}`}>
-                        <feature.icon className="h-6 w-6" />
-                      </div>
-                      <h3 className="font-semibold mb-2">{feature.title}</h3>
-                      <p className="text-sm text-muted-foreground">{feature.description}</p>
-                    </CardContent>
-                  </Card>
-                </motion.div>
-              ))}
-            </div>
-          </div>
-        </section>
+        <LandingFeatures />
 
         {/* Quick Actions */}
-        <section className="py-20 px-4">
-          <div className="max-w-4xl mx-auto">
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8 }}
-              className="text-center mb-12"
-            >
-              <h2 className="text-3xl md:text-4xl font-bold mb-4">
-                Get Support Right Now
-              </h2>
-              <p className="text-lg text-muted-foreground">
-                Choose the type of support that feels right for you today.
-              </p>
-            </motion.div>
-
-            <div className="grid md:grid-cols-2 gap-6">
-              <motion.div
-                initial={{ opacity: 0, x: -30 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.8 }}
-              >
-                <Card className="bg-card/50 backdrop-blur-sm border-border/50 hover:bg-card/70 transition-all duration-300 group cursor-pointer">
-                  <Link to="/assessment">
-                    <CardContent className="p-8">
-                      <div className="flex items-center gap-4 mb-4">
-                        <div className="p-3 rounded-lg bg-primary/20 text-primary group-hover:glow">
-                          <FileText className="h-6 w-6" />
-                        </div>
-                        <div>
-                          <h3 className="text-xl font-semibold">Take Assessment</h3>
-                          <p className="text-muted-foreground">PHQ-9 & GAD-7 validated tools</p>
-                        </div>
-                      </div>
-                      <p className="text-sm text-muted-foreground mb-4">
-                        Get a professional assessment of your mental health with personalized recommendations.
-                      </p>
-                      <div className="flex items-center text-primary font-medium">
-                        Start Assessment
-                        <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
-                      </div>
-                    </CardContent>
-                  </Link>
-                </Card>
-              </motion.div>
-
-              <motion.div
-                initial={{ opacity: 0, x: 30 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.8 }}
-              >
-                <Card className="bg-card/50 backdrop-blur-sm border-border/50 hover:bg-card/70 transition-all duration-300 group cursor-pointer">
-                  <Link to="/chatbot">
-                    <CardContent className="p-8">
-                      <div className="flex items-center gap-4 mb-4">
-                        <div className="p-3 rounded-lg bg-accent/20 text-accent group-hover:glow">
-                          <MessageCircle className="h-6 w-6" />
-                        </div>
-                        <div>
-                          <h3 className="text-xl font-semibold">AI Chat Support</h3>
-                          <p className="text-muted-foreground">24/7 intelligent assistance</p>
-                        </div>
-                      </div>
-                      <p className="text-sm text-muted-foreground mb-4">
-                        Talk to our AI assistant about your feelings, get coping strategies, and crisis support.
-                      </p>
-                      <div className="flex items-center text-accent font-medium">
-                        Start Chatting
-                        <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
-                      </div>
-                    </CardContent>
-                  </Link>
-                </Card>
-              </motion.div>
-            </div>
-          </div>
-        </section>
+        <LandingQuickActions />
 
         {/* Reviews Section */}
         <section className="py-20 px-4">
