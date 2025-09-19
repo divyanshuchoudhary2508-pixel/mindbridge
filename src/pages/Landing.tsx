@@ -160,25 +160,25 @@ export default function Landing() {
         <LandingQuickActions />
 
         {/* Reviews Section */}
-        <section className="py-20 px-4 bg-muted/20">
+        <section className="py-12 md:py-20 px-4 bg-muted/20">
           <div className="max-w-4xl mx-auto">
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8 }}
-              className="text-center mb-12"
+              className="text-center mb-8 md:mb-12"
             >
-              <h2 className="text-3xl font-bold mb-4">
+              <h2 className="text-2xl md:text-3xl font-bold mb-3 md:mb-4">
                 What Our Users Say
               </h2>
-              <p className="text-lg text-muted-foreground">
+              <p className="text-base md:text-lg text-muted-foreground">
                 Real experiences from people who've used our platform
               </p>
             </motion.div>
 
             {/* Recent Reviews */}
             {reviews && reviews.length > 0 && (
-              <div className="grid gap-6 mb-8">
+              <div className="grid gap-4 md:gap-6 mb-8">
                 {reviews.slice(0, 3).map((review) => (
                   <motion.div
                     key={review._id}
@@ -186,15 +186,15 @@ export default function Landing() {
                     whileInView={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.5 }}
                   >
-                    <Card className="p-6 border-0 shadow-sm">
-                      <CardContent className="p-0">
+                    <Card className="p-4 md:p-6 border-0 shadow-sm">
+                      <CardContent className="p-0 space-y-2 md:space-y-3">
                         <div className="flex items-start justify-between mb-3">
                           <div className="flex items-center gap-2">
                             <div className="flex">
                               {Array.from({ length: 5 }).map((_, i) => (
                                 <Star
                                   key={i}
-                                  className={`h-4 w-4 ${
+                                  className={`h-4 w-4 md:h-4 md:w-4 ${
                                     i < review.rating
                                       ? "text-yellow-400 fill-current"
                                       : "text-muted-foreground"
@@ -202,7 +202,7 @@ export default function Landing() {
                                 />
                               ))}
                             </div>
-                            <span className="text-sm text-muted-foreground">
+                            <span className="text-xs md:text-sm text-muted-foreground">
                               {review.name || "Anonymous"}
                             </span>
                           </div>
@@ -227,7 +227,7 @@ export default function Landing() {
                             </div>
                           )}
                         </div>
-                        <p className="text-sm">{review.comment}</p>
+                        <p className="text-sm leading-relaxed">{review.comment}</p>
                       </CardContent>
                     </Card>
                   </motion.div>
@@ -241,9 +241,9 @@ export default function Landing() {
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8 }}
             >
-              <Card className="p-6 border-0 shadow-sm">
+              <Card className="p-4 md:p-6 border-0 shadow-sm">
                 <CardContent className="p-0">
-                  <h3 className="text-lg font-semibold mb-4">Share Your Experience</h3>
+                  <h3 className="text-base md:text-lg font-semibold mb-4">Share Your Experience</h3>
                   
                   <div className="space-y-4">
                     <div>
@@ -256,7 +256,7 @@ export default function Landing() {
                             className="p-1"
                           >
                             <Star
-                              className={`h-6 w-6 transition-colors ${
+                              className={`h-5 w-5 md:h-6 md:w-6 transition-colors ${
                                 i < rating
                                   ? "text-yellow-400 fill-current"
                                   : "text-muted-foreground hover:text-yellow-400"
@@ -273,11 +273,11 @@ export default function Landing() {
                         value={comment}
                         onChange={(e) => setComment(e.target.value)}
                         placeholder="Tell us about your experience..."
-                        className="min-h-[100px]"
+                        className="min-h-[90px] md:min-h-[100px]"
                       />
                     </div>
 
-                    <div className="grid md:grid-cols-2 gap-4">
+                    <div className="grid gap-3 md:grid-cols-2 md:gap-4">
                       <div>
                         <label className="text-sm font-medium mb-2 block">Name (Optional)</label>
                         <Input
@@ -302,7 +302,7 @@ export default function Landing() {
                     <Button
                       onClick={handleSubmitReview}
                       disabled={!rating || !comment.trim()}
-                      className="w-full glow"
+                      className="w-full"
                     >
                       Submit Review
                     </Button>
@@ -314,11 +314,11 @@ export default function Landing() {
         </section>
 
         {/* Footer */}
-        <footer className="py-12 px-4 border-t bg-muted/10">
+        <footer className="py-8 md:py-12 px-4 border-t bg-muted/10">
           <div className="max-w-7xl mx-auto text-center">
-            <div className="text-sm text-muted-foreground space-y-2">
-              <p>© 2024 Anonymous Aid. Providing anonymous mental health support.</p>
-              <p>
+            <div className="text-xs md:text-sm text-muted-foreground space-y-2">
+              <p className="leading-relaxed">© 2024 Anonymous Aid. Providing anonymous mental health support.</p>
+              <p className="leading-relaxed">
                 If you're in crisis, please call 988 (Suicide Prevention Lifeline) or text HOME to 741741.
               </p>
             </div>
