@@ -56,16 +56,16 @@ export default function Navbar() {
     <nav className="fixed top-0 left-0 right-0 z-40 bg-card/80 backdrop-blur-md border-b border-border">
       <div className="w-full px-3 sm:px-4">
         <div className="flex justify-between items-center h-16">
-          {/* Logo */}
+          {/* Logo - Left side */}
           <Link to="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-gradient-to-br from-primary to-accent rounded-lg flex items-center justify-center glow">
+            <div className="w-8 h-8 bg-gradient-to-br from-primary to-accent rounded-lg flex items-center justify-center">
               <Brain className="h-5 w-5 text-primary-foreground" />
             </div>
             <span className="font-bold text-lg gradient-text -ml-1">Anonymous Aid</span>
           </Link>
 
-          {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center gap-6">
+          {/* Desktop Navigation - Right side */}
+          <div className="hidden md:flex items-center gap-2 ml-auto">
             {navigation.map((item) => {
               const Icon = item.icon;
               const isActive = location.pathname === item.href;
@@ -75,7 +75,7 @@ export default function Navbar() {
                   to={item.href}
                   className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-all duration-200 ${
                     isActive
-                      ? "bg-primary/20 text-primary glow"
+                      ? "bg-primary/20 text-primary"
                       : "text-muted-foreground hover:text-foreground hover:bg-muted"
                   }`}
                 >
@@ -86,9 +86,9 @@ export default function Navbar() {
             })}
           </div>
 
-          {/* Auth + Theme Section (Desktop) */}
-          <div className="hidden md:flex items-center gap-4">
-            {/* Add: Theme toggle */}
+          {/* Auth + Theme Section - Far right */}
+          <div className="hidden md:flex items-center gap-4 ml-6">
+            {/* Theme toggle */}
             <Button
               variant="ghost"
               size="sm"
@@ -107,25 +107,24 @@ export default function Navbar() {
                   variant="outline"
                   size="sm"
                   onClick={() => signOut()}
-                  className="neon-border"
                 >
                   Sign Out
                 </Button>
               </div>
             ) : (
               <Link to="/auth">
-                <Button variant="outline" size="sm" className="neon-border">
+                <Button variant="outline" size="sm">
                   Sign In
                 </Button>
               </Link>
             )}
           </div>
 
-          {/* Mobile menu button */}
+          {/* Mobile menu button - Right side */}
           <Button
             variant="ghost"
             size="sm"
-            className="md:hidden"
+            className="md:hidden ml-auto"
             onClick={() => setIsOpen(!isOpen)}
           >
             {isOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
@@ -133,7 +132,7 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* Mobile Navigation */}
+      {/* Mobile Navigation - Keep existing mobile menu structure */}
       <motion.div
         initial={false}
         animate={{ height: isOpen ? "auto" : 0 }}
