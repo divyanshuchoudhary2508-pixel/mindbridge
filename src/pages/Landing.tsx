@@ -85,13 +85,17 @@ export default function Landing() {
     }
 
     try {
+      // Use authenticated user's details when available
+      const nameToSend = isAuthenticated && user ? (user.name || undefined) : (name.trim() || undefined);
+      const emailToSend = isAuthenticated && user ? (user.email || undefined) : (email.trim() || undefined);
+
       await submitReview({
         anonymousId,
         rating,
         comment: comment.trim(),
         page: "landing",
-        name: name.trim() || undefined,
-        email: email.trim() || undefined,
+        name: nameToSend,
+        email: emailToSend,
       });
       
       toast.success("Thank you for your review!");
@@ -281,18 +285,20 @@ export default function Landing() {
                       <div>
                         <label className="text-sm font-medium mb-2 block">Name (Optional)</label>
                         <Input
-                          value={name}
+                          value={isAuthenticated ? (user?.name ?? name) : name}
                           onChange={(e) => setName(e.target.value)}
                           placeholder="Your name"
+                          disabled={!!isAuthenticated}
                         />
                       </div>
                       <div>
                         <label className="text-sm font-medium mb-2 block">Email (Optional)</label>
                         <Input
                           type="email"
-                          value={email}
+                          value={isAuthenticated ? (user?.email ?? email) : email}
                           onChange={(e) => setEmail(e.target.value)}
                           placeholder="your@email.com"
+                          disabled={!!isAuthenticated}
                         />
                       </div>
                     </div>
