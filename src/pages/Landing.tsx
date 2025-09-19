@@ -59,10 +59,10 @@ export default function Landing() {
     }
     setAnonymousId(id);
 
-    // Pre-fill user data if authenticated
+    // Remove pre-fill user data if authenticated (reverted to manual entry)
     if (user) {
-      setName(user.name || "");
-      setEmail(user.email || "");
+      setName("");
+      setEmail("");
     }
 
     // Listen for emergency bar events
@@ -85,26 +85,22 @@ export default function Landing() {
     }
 
     try {
-      // Use authenticated user's details when available
-      const nameToSend = isAuthenticated && user ? (user.name || undefined) : (name.trim() || undefined);
-      const emailToSend = isAuthenticated && user ? (user.email || undefined) : (email.trim() || undefined);
-
+      // Revert to manual user-provided details
       await submitReview({
         anonymousId,
         rating,
         comment: comment.trim(),
         page: "landing",
-        name: nameToSend,
-        email: emailToSend,
+        name: name.trim() || undefined,
+        email: email.trim() || undefined,
       });
       
       toast.success("Thank you for your review!");
       setRating(0);
       setComment("");
-      if (!user) {
-        setName("");
-        setEmail("");
-      }
+      // Always clear name/email to keep manual entry flow
+      setName("");
+      setEmail("");
     } catch (error) {
       toast.error("Failed to submit review");
     }
@@ -285,20 +281,20 @@ export default function Landing() {
                       <div>
                         <label className="text-sm font-medium mb-2 block">Name (Optional)</label>
                         <Input
-                          value={isAuthenticated ? (user?.name ?? name) : name}
+                          value={name}
                           onChange={(e) => setName(e.target.value)}
                           placeholder="Your name"
-                          disabled={!!isAuthenticated}
+                          disabled={false}
                         />
                       </div>
                       <div>
                         <label className="text-sm font-medium mb-2 block">Email (Optional)</label>
                         <Input
                           type="email"
-                          value={isAuthenticated ? (user?.email ?? email) : email}
+                          value={email}
                           onChange={(e) => setEmail(e.target.value)}
                           placeholder="your@email.com"
-                          disabled={!!isAuthenticated}
+                          disabled={false}
                         />
                       </div>
                     </div>

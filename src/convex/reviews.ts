@@ -38,33 +38,11 @@ export const listRecent = query({
       .order("desc")
       .take(10);
 
-    // Resolve user names/emails for logged-in reviewers when missing on the review
-    const userCache = new Map<string, any>();
-    const resolved = [];
-    for (const review of reviews) {
-      let resolvedName = review.name;
-      let resolvedEmail = review.email;
-
-      if (review.userId && (!resolvedName || !resolvedEmail)) {
-        const key = review.userId as unknown as string;
-        let userDoc = userCache.get(key);
-        if (!userDoc) {
-          userDoc = await ctx.db.get(review.userId);
-          userCache.set(key, userDoc);
-        }
-        if (!resolvedName && userDoc?.name) resolvedName = userDoc.name;
-        if (!resolvedEmail && userDoc?.email) resolvedEmail = userDoc.email;
-      }
-
-      resolved.push({
-        ...review,
-        name: resolvedName,
-        email: resolvedEmail,
-        isMine: review.anonymousId === args.anonymousId,
-      });
-    }
-
-    return resolved;
+    // Revert: do not resolve names/emails from user profiles; keep as stored
+    return reviews.map((review) => ({
+      ...review,
+      isMine: review.anonymousId === args.anonymousId,
+    }));
   },
 });
 
