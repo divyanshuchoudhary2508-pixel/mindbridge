@@ -14,6 +14,7 @@ import type {
   FunctionReference,
 } from "convex/server";
 import type * as ai from "../ai.js";
+import type * as appointments from "../appointments.js";
 import type * as assessments from "../assessments.js";
 import type * as auth_emailOtp from "../auth/emailOtp.js";
 import type * as auth from "../auth.js";
@@ -35,6 +36,7 @@ import type * as users from "../users.js";
  */
 declare const fullApi: ApiFromModules<{
   ai: typeof ai;
+  appointments: typeof appointments;
   assessments: typeof assessments;
   "auth/emailOtp": typeof auth_emailOtp;
   auth: typeof auth;
