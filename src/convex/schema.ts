@@ -30,14 +30,100 @@ const schema = defineSchema(
       isAnonymous: v.optional(v.boolean()), // is the user anonymous. do not remove
 
       role: v.optional(roleValidator), // role of the user. do not remove
+      anonymousId: v.optional(v.string()), // for linking anonymous sessions
     }).index("email", ["email"]), // index for the email. do not remove or modify
 
-    // add other tables here
+    // Chat messages for AI chatbot
+    chatMessages: defineTable({
+      anonymousId: v.string(),
+      userId: v.optional(v.id("users")),
+      message: v.string(),
+      isUser: v.boolean(),
+      timestamp: v.number(),
+    }).index("by_anonymous_id", ["anonymousId"])
+      .index("by_user_id", ["userId"]),
 
-    // tableName: defineTable({
-    //   ...
-    //   // table fields
-    // }).index("by_field", ["field"])
+    // Assessment results
+    assessmentResults: defineTable({
+      anonymousId: v.string(),
+      userId: v.optional(v.id("users")),
+      assessmentType: v.string(), // "PHQ-9", "GAD-7", etc.
+      score: v.number(),
+      riskLevel: v.string(), // "low", "moderate", "high", "severe"
+      responses: v.array(v.number()),
+      recommendations: v.array(v.string()),
+      emailSent: v.optional(v.boolean()),
+      emailSentAt: v.optional(v.number()),
+    }).index("by_anonymous_id", ["anonymousId"])
+      .index("by_user_id", ["userId"]),
+
+    // Reviews for assessments and landing page
+    reviews: defineTable({
+      anonymousId: v.string(),
+      userId: v.optional(v.id("users")),
+      rating: v.number(), // 1-5 stars
+      comment: v.string(),
+      page: v.string(), // "landing", "assessment", etc.
+      name: v.optional(v.string()),
+      email: v.optional(v.string()),
+    }).index("by_page", ["page"])
+      .index("by_anonymous_id", ["anonymousId"]),
+
+    // Forum posts for peer support
+    forumPosts: defineTable({
+      anonymousId: v.string(),
+      userId: v.optional(v.id("users")),
+      title: v.string(),
+      content: v.string(),
+      isAnonymous: v.boolean(),
+      replies: v.optional(v.number()),
+    }).index("by_anonymous_id", ["anonymousId"]),
+
+    // Forum replies
+    forumReplies: defineTable({
+      postId: v.id("forumPosts"),
+      anonymousId: v.string(),
+      userId: v.optional(v.id("users")),
+      content: v.string(),
+      isAnonymous: v.boolean(),
+    }).index("by_post_id", ["postId"])
+      .index("by_anonymous_id", ["anonymousId"]),
+
+    // Mental health resources
+    resources: defineTable({
+      title: v.string(),
+      description: v.string(),
+      content: v.string(),
+      type: v.string(), // "article", "video", "guide"
+      category: v.string(), // "anxiety", "depression", "stress", etc.
+      url: v.optional(v.string()),
+      imageUrl: v.optional(v.string()),
+      featured: v.optional(v.boolean()),
+    }).index("by_category", ["category"])
+      .index("by_type", ["type"]),
+
+    // Appointments with professionals
+    appointments: defineTable({
+      userId: v.id("users"),
+      professionalName: v.string(),
+      professionalEmail: v.string(),
+      date: v.string(),
+      time: v.string(),
+      status: v.string(), // "pending", "confirmed", "cancelled"
+      notes: v.optional(v.string()),
+    }).index("by_user_id", ["userId"])
+      .index("by_status", ["status"]),
+
+    // Emergency contacts
+    emergencyContacts: defineTable({
+      name: v.string(),
+      phone: v.string(),
+      description: v.string(),
+      country: v.string(),
+      available24h: v.boolean(),
+      category: v.string(), // "crisis", "suicide", "domestic", etc.
+    }).index("by_country", ["country"])
+      .index("by_category", ["category"]),
   },
   {
     schemaValidation: false,
