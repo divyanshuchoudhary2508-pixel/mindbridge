@@ -4,11 +4,20 @@ import { Link, useLocation } from "react-router";
 import { Menu, X, Brain, MessageCircle, FileText, Users, Calendar, Phone, Sun, Moon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/use-auth";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { useNavigate } from "react-router";
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
   const { isAuthenticated, user, signOut } = useAuth();
+  const navigate = useNavigate();
 
   // Add: theme state & initialize from localStorage
   const [isDark, setIsDark] = useState<boolean>(() => {
@@ -61,7 +70,7 @@ export default function Navbar() {
             <div className="w-8 h-8 bg-gradient-to-br from-primary to-accent rounded-lg flex items-center justify-center">
               <Brain className="h-5 w-5 text-primary-foreground" />
             </div>
-            <span className="font-bold text-lg gradient-text -ml-1">Anonymous Aid</span>
+            <span className="font-bold text-lg gradient-text -ml-1">MindBridge</span>
           </Link>
 
           {/* Desktop Navigation - Close to logo */}
@@ -98,26 +107,53 @@ export default function Navbar() {
               {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
             </Button>
 
-            {isAuthenticated ? (
-              <div className="flex items-center gap-3">
-                <span className="text-sm text-muted-foreground">
-                  {user?.name || user?.email || "User"}
-                </span>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => signOut()}
-                >
-                  Sign Out
-                </Button>
-              </div>
-            ) : (
-              <Link to="/auth">
+            {/* Replace Sign In/Out with Settings menu */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
                 <Button variant="outline" size="sm">
-                  Sign In
+                  Settings
                 </Button>
-              </Link>
-            )}
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56">
+                {isAuthenticated ? (
+                  <DropdownMenuItem
+                    onClick={async () => {
+                      await signOut();
+                      navigate("/");
+                    }}
+                    className="cursor-pointer"
+                  >
+                    Sign Out
+                  </DropdownMenuItem>
+                ) : (
+                  <DropdownMenuItem
+                    onClick={() => navigate("/auth")}
+                    className="cursor-pointer"
+                  >
+                    Sign In
+                  </DropdownMenuItem>
+                )}
+                <DropdownMenuSeparator />
+                {isAuthenticated && user?.role === "admin" ? (
+                  <DropdownMenuItem
+                    onClick={async () => {
+                      await signOut();
+                      navigate("/");
+                    }}
+                    className="cursor-pointer text-destructive focus:text-destructive"
+                  >
+                    Admin Sign Out
+                  </DropdownMenuItem>
+                ) : (
+                  <DropdownMenuItem
+                    onClick={() => navigate("/auth-admin")}
+                    className="cursor-pointer"
+                  >
+                    Admin Sign In
+                  </DropdownMenuItem>
+                )}
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
 
           {/* Mobile menu button - Right side */}
@@ -174,30 +210,77 @@ export default function Navbar() {
             );
           })}
           
-          <div className="pt-4 border-t border-border">
-            {isAuthenticated ? (
-              <div className="space-y-2">
+          <div className="pt-4 border-t border-border space-y-2">
+            {/* Mobile Settings options */}
+            {!isAuthenticated ? (
+              <>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="w-full"
+                  onClick={() => {
+                    navigate("/auth");
+                    setIsOpen(false);
+                  }}
+                >
+                  Sign In
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="w-full"
+                  onClick={() => {
+                    navigate("/auth-admin");
+                    setIsOpen(false);
+                  }}
+                >
+                  Admin Sign In
+                </Button>
+              </>
+            ) : (
+              <>
                 <div className="px-3 py-2 text-sm text-muted-foreground">
                   {user?.name || user?.email || "User"}
                 </div>
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => {
-                    signOut();
+                  className="w-full"
+                  onClick={async () => {
+                    await signOut();
                     setIsOpen(false);
+                    navigate("/");
                   }}
-                  className="w-full neon-border"
                 >
                   Sign Out
                 </Button>
-              </div>
-            ) : (
-              <Link to="/auth" onClick={() => setIsOpen(false)}>
-                <Button variant="outline" size="sm" className="w-full neon-border">
-                  Sign In
-                </Button>
-              </Link>
+                {user?.role === "admin" ? (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="w-full text-destructive"
+                    onClick={async () => {
+                      await signOut();
+                      setIsOpen(false);
+                      navigate("/");
+                    }}
+                  >
+                    Admin Sign Out
+                  </Button>
+                ) : (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="w-full"
+                    onClick={() => {
+                      navigate("/auth-admin");
+                      setIsOpen(false);
+                    }}
+                  >
+                    Admin Sign In
+                  </Button>
+                )}
+              </>
             )}
           </div>
         </div>

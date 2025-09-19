@@ -54,6 +54,7 @@ createRoot(document.getElementById("root")!).render(
           <Routes>
             <Route path="/" element={<Landing />} />
             <Route path="/auth" element={<AuthPage redirectAfterAuth="/" />} />
+            <Route path="/auth-admin" element={<AuthPage redirectAfterAuth="/admin" />} />
             <Route path="/assessment" element={<Assessment />} />
             <Route path="/chatbot" element={<Chatbot />} />
             <Route path="/resources" element={<Resources />} />
