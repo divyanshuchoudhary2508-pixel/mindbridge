@@ -46,6 +46,15 @@ export const listRecent = query({
   },
 });
 
+export const listAllRecent = query({
+  args: {},
+  handler: async (ctx) => {
+    // Return the most recent 20 reviews across all pages
+    const reviews = await ctx.db.query("reviews").order("desc").take(20);
+    return reviews;
+  },
+});
+
 export const editReview = mutation({
   args: {
     reviewId: v.id("reviews"),
