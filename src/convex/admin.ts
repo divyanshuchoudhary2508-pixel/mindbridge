@@ -5,8 +5,14 @@ export const getAnalytics = query({
   args: {},
   handler: async (ctx) => {
     const user = await getCurrentUser(ctx);
+    // Return safe empty analytics for non-admins to avoid noisy errors during auth transitions
     if (!user || user.role !== "admin") {
-      throw new Error("Unauthorized");
+      return {
+        totalAssessments: 0,
+        byType: {},
+        riskDistribution: {},
+        recent: [],
+      };
     }
 
     // Aggregate assessment results
