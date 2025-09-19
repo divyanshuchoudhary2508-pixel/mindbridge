@@ -4,6 +4,7 @@ import EmergencyBar from "@/components/EmergencyBar";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useAction, useMutation, useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { toast } from "sonner";
@@ -13,6 +14,9 @@ export default function Chatbot() {
   const [anonymousId, setAnonymousId] = useState("");
   const [message, setMessage] = useState("");
   const [isSending, setIsSending] = useState(false);
+  const [speakReplies, setSpeakReplies] = useState(false);
+  const [voices, setVoices] = useState<SpeechSynthesisVoice[]>([]);
+  const [voiceName, setVoiceName] = useState<string>("");
 
   useEffect(() => {
     let id = localStorage.getItem("anonymousId");
@@ -41,6 +45,56 @@ export default function Chatbot() {
     () => anonymousId && message.trim().length > 0 && !isSending,
     [anonymousId, message, isSending],
   );
+
+  useEffect(() => {
+    const loadVoices = () => {
+      const v = window.speechSynthesis?.getVoices?.() || [];
+      setVoices(v);
+      if (!voiceName && v.length > 0) setVoiceName(v[0].name);
+    };
+    loadVoices();
+    if ("speechSynthesis" in window) {
+      window.speechSynthesis.onvoiceschanged = loadVoices;
+    }
+  }, [voiceName]);
+
+  // speech to text (browser)
+  const [isRecording, setIsRecording] = useState(false);
+  const recRef = useRef<any>(null);
+  const startRecording = () => {
+    const w = window as any;
+    const SR = w.SpeechRecognition || w.webkitSpeechRecognition;
+    if (!SR) return;
+    const rec = new SR();
+    rec.lang = "en-US";
+    rec.interimResults = false;
+    rec.maxAlternatives = 1;
+    rec.onresult = (e: any) => {
+      const transcript = e.results?.[0]?.[0]?.transcript || "";
+      if (transcript) setMessage((prev) => (prev ? prev + " " : "") + transcript);
+    };
+    rec.onend = () => setIsRecording(false);
+    rec.onerror = () => setIsRecording(false);
+    rec.start();
+    recRef.current = rec;
+    setIsRecording(true);
+  };
+  const stopRecording = () => {
+    try {
+      recRef.current?.stop?.();
+    } finally {
+      setIsRecording(false);
+    }
+  };
+
+  // helper speak
+  const speak = (text: string) => {
+    if (!speakReplies || !("speechSynthesis" in window)) return;
+    const u = new SpeechSynthesisUtterance(text);
+    const v = voices.find((vv) => vv.name === voiceName);
+    if (v) u.voice = v;
+    window.speechSynthesis.speak(u);
+  };
 
   const handleSend = async () => {
     if (!canSend) return;
@@ -71,6 +125,8 @@ export default function Chatbot() {
           "Crisis indicators detected. Emergency resources have been suggested in the conversation.",
         );
       }
+      // speak assistant reply that was appended to history; also speak from returned response
+      if (res?.response) speak(res.response);
     } catch (err) {
       toast.error("Failed to send message");
     } finally {
@@ -112,6 +168,46 @@ export default function Chatbot() {
                   <Trash2 className="h-4 w-4 mr-2" />
                   Clear
                 </Button>
+              </div>
+
+              <div className="flex flex-wrap items-center gap-3 mb-4">
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant={isRecording ? "destructive" : "outline"}
+                    size="sm"
+                    onClick={isRecording ? stopRecording : startRecording}
+                    className="neon-border"
+                  >
+                    {isRecording ? "Stop Mic" : "Start Mic"}
+                  </Button>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant={speakReplies ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setSpeakReplies((s) => !s)}
+                    className={speakReplies ? "glow" : "neon-border"}
+                  >
+                    {speakReplies ? "Speaking: On" : "Speaking: Off"}
+                  </Button>
+                </div>
+                <div className="min-w-[220px]">
+                  <Select
+                    value={voiceName || ""}
+                    onValueChange={(v) => setVoiceName(v)}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select voice" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {voices.map((v) => (
+                        <SelectItem key={v.name} value={v.name}>
+                          {v.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
 
               <div className="h-[50vh] max-h-[60vh] min-h-[320px] overflow-y-auto rounded-md border border-border/50 p-3 space-y-3 bg-muted/30">

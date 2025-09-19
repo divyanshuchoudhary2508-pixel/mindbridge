@@ -45,6 +45,30 @@ export const listRecent = query({
   },
 });
 
+export const editReview = mutation({
+  args: {
+    reviewId: v.id("reviews"),
+    anonymousId: v.string(),
+    rating: v.number(),
+    comment: v.string(),
+    name: v.optional(v.string()),
+    email: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    const review = await ctx.db.get(args.reviewId);
+    if (!review) throw new Error("Review not found");
+    if (review.anonymousId !== args.anonymousId) {
+      throw new Error("You can only edit your own reviews");
+    }
+    await ctx.db.patch(args.reviewId, {
+      rating: args.rating,
+      comment: args.comment,
+      name: args.name,
+      email: args.email,
+    });
+  },
+});
+
 export const deleteReview = mutation({
   args: {
     reviewId: v.id("reviews"),

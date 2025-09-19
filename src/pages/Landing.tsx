@@ -45,6 +45,7 @@ export default function Landing() {
   
   const submitReview = useMutation(api.reviews.submitReview);
   const deleteReview = useMutation(api.reviews.deleteReview);
+  const editReview = useMutation(api.reviews.editReview);
 
   useEffect(() => {
     // Generate or get anonymous ID
@@ -111,6 +112,27 @@ export default function Landing() {
     }
   };
 
+  const handleEditReview = async (review: any) => {
+    const newComment = prompt("Edit your review comment:", review.comment) ?? "";
+    if (!newComment.trim()) return;
+    const newRatingStr = prompt("Edit your rating (1-5):", String(review.rating)) ?? "";
+    const newRating = Number(newRatingStr);
+    if (!Number.isFinite(newRating) || newRating < 1 || newRating > 5) return;
+    try {
+      await editReview({
+        reviewId: review._id,
+        anonymousId,
+        rating: newRating,
+        comment: newComment.trim(),
+        name: name.trim() || undefined,
+        email: email.trim() || undefined,
+      });
+      toast.success("Review updated");
+    } catch {
+      toast.error("Failed to update review");
+    }
+  };
+
   const showEmergencyBar = () => {
     window.dispatchEvent(new CustomEvent("showEmergencyBar"));
   };
@@ -122,8 +144,8 @@ export default function Landing() {
       
       <CalmBackground
         showVideo={window.innerWidth > 768}
-        videoSrc="https://player.vimeo.com/external/434045526.sd.mp4?s=c27eecc69a27dbc4ff2b87d38afc35f1a9e7c02d&profile_id=139&oauth2_token_id=57447761"
-        posterSrc="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1920&h=1080&fit=crop"
+        videoSrc="https://cdn.coverr.co/videos/coverr-a-photographer-in-the-woods-1701/1080p.mp4"
+        posterSrc="https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&w=3840&q=80"
       >
         {/* Hero Section */}
         <section className="pt-32 pb-20 px-4">
@@ -362,14 +384,24 @@ export default function Landing() {
                             </span>
                           </div>
                           {review.isMine && (
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => handleDeleteReview(review._id)}
-                              className="text-destructive hover:text-destructive"
-                            >
-                              Delete
-                            </Button>
+                            <div className="flex items-center gap-2">
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => handleEditReview(review)}
+                                className="neon-border"
+                              >
+                                Edit
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => handleDeleteReview(review._id)}
+                                className="text-destructive hover:text-destructive"
+                              >
+                                Delete
+                              </Button>
+                            </div>
                           )}
                         </div>
                         <p className="text-sm">{review.comment}</p>

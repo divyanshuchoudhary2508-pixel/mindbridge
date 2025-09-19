@@ -46,6 +46,7 @@ export default function Assessment() {
   const submitAssessment = useMutation(api.assessments.submitAssessment);
   const submitReview = useMutation(api.reviews.submitReview);
   const deleteReview = useMutation(api.reviews.deleteReview);
+  const editReview = useMutation(api.reviews.editReview);
 
   useEffect(() => {
     let id = localStorage.getItem("anonymousId");
@@ -133,6 +134,27 @@ export default function Assessment() {
       }
     } catch (error) {
       toast.error("Failed to submit review");
+    }
+  };
+
+  const handleEditReview = async (review: any) => {
+    const newComment = prompt("Edit your review comment:", review.comment) ?? "";
+    if (!newComment.trim()) return;
+    const newRatingStr = prompt("Edit your rating (1-5):", String(review.rating)) ?? "";
+    const newRating = Number(newRatingStr);
+    if (!Number.isFinite(newRating) || newRating < 1 || newRating > 5) return;
+    try {
+      await editReview({
+        reviewId: review._id,
+        anonymousId,
+        rating: newRating,
+        comment: newComment.trim(),
+        name: name.trim() || undefined,
+        email: email.trim() || undefined,
+      });
+      toast.success("Review updated");
+    } catch {
+      toast.error("Failed to update review");
     }
   };
 
@@ -409,14 +431,24 @@ export default function Assessment() {
                             </span>
                           </div>
                           {review.isMine && (
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => handleDeleteReview(review._id)}
-                              className="text-destructive hover:text-destructive"
-                            >
-                              Delete
-                            </Button>
+                            <div className="flex items-center gap-2">
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => handleEditReview(review)}
+                                className="neon-border"
+                              >
+                                Edit
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => handleDeleteReview(review._id)}
+                                className="text-destructive hover:text-destructive"
+                              >
+                                Delete
+                              </Button>
+                            </div>
                           )}
                         </div>
                         <p className="text-sm">{review.comment}</p>

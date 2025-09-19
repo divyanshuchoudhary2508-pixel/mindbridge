@@ -19,6 +19,7 @@ import type * as auth_emailOtp from "../auth/emailOtp.js";
 import type * as auth from "../auth.js";
 import type * as chatbot from "../chatbot.js";
 import type * as emergency from "../emergency.js";
+import type * as forum from "../forum.js";
 import type * as http from "../http.js";
 import type * as resources from "../resources.js";
 import type * as reviews from "../reviews.js";
@@ -39,6 +40,7 @@ declare const fullApi: ApiFromModules<{
   auth: typeof auth;
   chatbot: typeof chatbot;
   emergency: typeof emergency;
+  forum: typeof forum;
   http: typeof http;
   resources: typeof resources;
   reviews: typeof reviews;
