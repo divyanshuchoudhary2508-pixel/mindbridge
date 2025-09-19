@@ -160,7 +160,7 @@ export default function Landing() {
         <LandingQuickActions />
 
         {/* Reviews Section */}
-        <section className="py-20 px-4">
+        <section className="py-20 px-4 bg-muted/20">
           <div className="max-w-4xl mx-auto">
             <motion.div
               initial={{ opacity: 0, y: 30 }}
@@ -168,17 +168,17 @@ export default function Landing() {
               transition={{ duration: 0.8 }}
               className="text-center mb-12"
             >
-              <h2 className="text-3xl md:text-4xl font-bold mb-4">
-                What People Are Saying
+              <h2 className="text-3xl font-bold mb-4">
+                What Our Users Say
               </h2>
               <p className="text-lg text-muted-foreground">
-                Real feedback from people who've used our platform.
+                Real experiences from people who've used our platform
               </p>
             </motion.div>
 
             {/* Recent Reviews */}
             {reviews && reviews.length > 0 && (
-              <div className="grid gap-4 mb-8">
+              <div className="grid gap-6 mb-8">
                 {reviews.slice(0, 3).map((review) => (
                   <motion.div
                     key={review._id}
@@ -186,8 +186,8 @@ export default function Landing() {
                     whileInView={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.5 }}
                   >
-                    <Card className="bg-card/50 backdrop-blur-sm border-border/50">
-                      <CardContent className="p-6">
+                    <Card className="p-6 border-0 shadow-sm">
+                      <CardContent className="p-0">
                         <div className="flex items-start justify-between mb-3">
                           <div className="flex items-center gap-2">
                             <div className="flex">
@@ -241,8 +241,8 @@ export default function Landing() {
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8 }}
             >
-              <Card className="bg-card/50 backdrop-blur-sm border-border/50">
-                <CardContent className="p-6">
+              <Card className="p-6 border-0 shadow-sm">
+                <CardContent className="p-0">
                   <h3 className="text-lg font-semibold mb-4">Share Your Experience</h3>
                   
                   <div className="space-y-4">
@@ -312,11 +312,11 @@ export default function Landing() {
         </section>
 
         {/* Footer */}
-        <footer className="py-12 px-4 border-t border-border/50">
-          <div className="max-w-7xl mx-auto">
-            <div className="mt-8 pt-8 border-t border-border/50 text-center text-sm text-muted-foreground">
+        <footer className="py-12 px-4 border-t bg-muted/10">
+          <div className="max-w-7xl mx-auto text-center">
+            <div className="text-sm text-muted-foreground space-y-2">
               <p>© 2024 Anonymous Aid. Providing anonymous mental health support.</p>
-              <p className="mt-2">
+              <p>
                 If you're in crisis, please call 988 (Suicide Prevention Lifeline) or text HOME to 741741.
               </p>
             </div>

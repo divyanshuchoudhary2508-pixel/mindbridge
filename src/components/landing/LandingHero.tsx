@@ -1,50 +1,55 @@
 import { motion } from "framer-motion";
 import { Link } from "react-router";
-import { Heart, MessageCircle, ArrowRight } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { ArrowRight } from "lucide-react";
 
 export default function LandingHero() {
   return (
-    <section className="pt-32 pb-20 px-4">
-      <div className="max-w-7xl mx-auto text-center">
+    <section className="py-24 px-4">
+      <div className="max-w-4xl mx-auto text-center">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
+          className="space-y-8"
         >
-          <Badge variant="secondary" className="mb-6 neon-border">
-            <Heart className="h-3 w-3 mr-1" />
-            100% Anonymous & Free
-          </Badge>
-
-          <h1 className="text-5xl md:text-7xl font-bold mb-6 gradient-text">
-            Mental Health Support
-          </h1>
-
-          <p className="text-xl md:text-2xl text-muted-foreground mb-4 max-w-3xl mx-auto">
-            Discover Your Mental Health Score in Minutes
-          </p>
-
-          <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto">
-            Quick, anonymous self-assessments with AI-powered support.
-            Get personalized insights and connect with professional help when you need it.
-          </p>
+          <div className="space-y-4">
+            <h1 className="text-5xl md:text-6xl font-bold text-foreground">
+              Professional Mental Health
+              <span className="block text-primary">Support & Care</span>
+            </h1>
+            <p className="text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+              Get personalized mental health assessments, AI-powered support, and connect with licensed professionals - all anonymously and free.
+            </p>
+          </div>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Link to="/appointments">
+              <Button size="lg" className="px-8 py-6 text-lg">
+                Free Consultation
+                <ArrowRight className="ml-2 h-5 w-5" />
+              </Button>
+            </Link>
             <Link to="/assessment">
-              <Button size="lg" className="glow group">
-                Get Started
-                <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+              <Button variant="outline" size="lg" className="px-8 py-6 text-lg">
+                Take Assessment
               </Button>
             </Link>
+          </div>
 
-            <Link to="/chatbot">
-              <Button variant="outline" size="lg" className="neon-border">
-                <MessageCircle className="mr-2 h-5 w-5" />
-                Talk to AI Assistant
-              </Button>
-            </Link>
+          <div className="flex items-center justify-center gap-8 text-sm text-muted-foreground">
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+              <span>100% Anonymous</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+              <span>Licensed Professionals</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
+              <span>24/7 AI Support</span>
+            </div>
           </div>
         </motion.div>
       </div>

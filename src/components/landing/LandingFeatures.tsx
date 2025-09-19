@@ -1,49 +1,53 @@
 import { motion } from "framer-motion";
-import { Shield, Clock, Brain, Users } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
+import { Shield, Clock, Brain, Users, Heart, Zap } from "lucide-react";
+import { Card } from "@/components/ui/card";
 
 export default function LandingFeatures() {
   const features = [
     {
       icon: Shield,
-      title: "100% Anonymous",
-      description: "No registration required. Your privacy is our priority.",
-      color: "text-primary",
+      title: "Complete Privacy",
+      description: "Your identity remains anonymous throughout your entire journey with us.",
+      color: "text-blue-600",
+      bgColor: "bg-blue-50"
     },
     {
       icon: Clock,
       title: "Quick Assessment",
-      description: "Get your mental health score in just 5 minutes.",
-      color: "text-accent",
+      description: "Professional mental health screening in just 5 minutes with validated tools.",
+      color: "text-green-600",
+      bgColor: "bg-green-50"
     },
     {
       icon: Brain,
       title: "AI-Powered Support",
-      description: "24/7 intelligent assistance with voice capabilities.",
-      color: "text-secondary",
+      description: "Intelligent 24/7 assistance with advanced mental health understanding.",
+      color: "text-purple-600",
+      bgColor: "bg-purple-50"
     },
     {
       icon: Users,
-      title: "Professional Network",
-      description: "Connect with licensed mental health professionals.",
-      color: "text-primary",
+      title: "Expert Network",
+      description: "Connect with licensed mental health professionals for personalized care.",
+      color: "text-orange-600",
+      bgColor: "bg-orange-50"
     },
   ] as const;
 
   return (
-    <section className="py-20 px-4">
-      <div className="max-w-7xl mx-auto">
+    <section className="py-20 px-4 bg-muted/30">
+      <div className="max-w-6xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
           className="text-center mb-16"
         >
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">
-            Why Choose Anonymous Aid?
+          <h2 className="text-4xl font-bold mb-4">
+            Why Choose Our Platform
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Professional-grade mental health tools designed with your privacy and well-being in mind.
+            Professional-grade mental health tools designed with your privacy and well-being in mind
           </p>
         </motion.div>
 
@@ -55,14 +59,14 @@ export default function LandingFeatures() {
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: index * 0.1 }}
             >
-              <Card className="h-full bg-card/50 backdrop-blur-sm border-border/50 hover:bg-card/70 transition-all duration-300 group">
-                <CardContent className="p-6 text-center">
-                  <div className={`inline-flex p-3 rounded-lg bg-muted mb-4 group-hover:glow transition-all duration-300 ${feature.color}`}>
-                    <feature.icon className="h-6 w-6" />
-                  </div>
-                  <h3 className="font-semibold mb-2">{feature.title}</h3>
-                  <p className="text-sm text-muted-foreground">{feature.description}</p>
-                </CardContent>
+              <Card className="h-full p-6 border-0 shadow-sm hover:shadow-md transition-shadow duration-300">
+                <div className={`inline-flex p-3 rounded-lg ${feature.bgColor} mb-4`}>
+                  <feature.icon className={`h-6 w-6 ${feature.color}`} />
+                </div>
+                <h3 className="text-lg font-semibold mb-2">{feature.title}</h3>
+                <p className="text-sm text-muted-foreground leading-relaxed">
+                  {feature.description}
+                </p>
               </Card>
             </motion.div>
           ))}
