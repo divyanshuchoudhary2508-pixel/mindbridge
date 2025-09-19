@@ -18,6 +18,8 @@ import { useAuth } from "@/hooks/use-auth";
 import { ArrowRight, Loader2, Mail, UserX } from "lucide-react";
 import { Suspense, useEffect, useState } from "react";
 import { useNavigate } from "react-router";
+import { useMutation } from "convex/react";
+import { api } from "@/convex/_generated/api";
 
 interface AuthProps {
   redirectAfterAuth?: string;
@@ -30,6 +32,8 @@ function Auth({ redirectAfterAuth }: AuthProps = {}) {
   const [otp, setOtp] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [pendingName, setPendingName] = useState("");
+  const ensureUser = useMutation(api.users.ensureUser);
 
   useEffect(() => {
     if (!authLoading && isAuthenticated) {
@@ -43,8 +47,18 @@ function Auth({ redirectAfterAuth }: AuthProps = {}) {
     setError(null);
     try {
       const formData = new FormData(event.currentTarget);
+      const email = formData.get("email") as string;
+      
+      // Validate email format
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        setError("Please enter a valid email address");
+        setIsLoading(false);
+        return;
+      }
+      
       await signIn("email-otp", formData);
-      setStep({ email: formData.get("email") as string });
+      setStep({ email: email });
       setIsLoading(false);
     } catch (error) {
       console.error("Email sign-in error:", error);
@@ -52,6 +66,47 @@ function Auth({ redirectAfterAuth }: AuthProps = {}) {
         error instanceof Error
           ? error.message
           : "Failed to send verification code. Please try again.",
+      );
+      setIsLoading(false);
+    }
+  };
+
+  const handleCreateAccount = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setIsLoading(true);
+    setError(null);
+    try {
+      const formData = new FormData(event.currentTarget);
+      const email = formData.get("email") as string;
+      const name = formData.get("name") as string;
+
+      // Validate inputs
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        setError("Please enter a valid email address");
+        setIsLoading(false);
+        return;
+      }
+
+      if (!name || name.trim().length < 2) {
+        setError("Please enter your name (at least 2 characters)");
+        setIsLoading(false);
+        return;
+      }
+
+      // Persist name for use after OTP verification
+      setPendingName(name.trim());
+
+      // Proceed with OTP verification (send code)
+      await signIn("email-otp", formData);
+      setStep({ email: email });
+      setIsLoading(false);
+    } catch (error) {
+      console.error("Account creation error:", error);
+      setError(
+        error instanceof Error
+          ? error.message
+          : "Failed to create account. Please try again.",
       );
       setIsLoading(false);
     }
@@ -65,7 +120,12 @@ function Auth({ redirectAfterAuth }: AuthProps = {}) {
       const formData = new FormData(event.currentTarget);
       await signIn("email-otp", formData);
 
-      console.log("signed in");
+      // Ensure a user record exists and save provided name
+      try {
+        await ensureUser({ name: pendingName || undefined });
+      } catch (e) {
+        console.warn("ensureUser failed:", e);
+      }
 
       const redirect = redirectAfterAuth || "/";
       navigate(redirect);
@@ -107,48 +167,59 @@ function Auth({ redirectAfterAuth }: AuthProps = {}) {
           {step === "signIn" ? (
             <>
               <CardHeader className="text-center">
-              <div className="flex justify-center">
-                    <img
-                      src="./logo.svg"
-                      alt="Lock Icon"
-                      width={64}
-                      height={64}
-                      className="rounded-lg mb-4 mt-4 cursor-pointer"
-                      onClick={() => navigate("/")}
-                    />
-                  </div>
-                <CardTitle className="text-xl">Get Started</CardTitle>
+                <div className="flex justify-center">
+                  <img
+                    src="./logo.svg"
+                    alt="Lock Icon"
+                    width={64}
+                    height={64}
+                    className="rounded-lg mb-4 mt-4 cursor-pointer"
+                    onClick={() => navigate("/")}
+                  />
+                </div>
+                <CardTitle className="text-xl">Create Account or Sign In</CardTitle>
                 <CardDescription>
-                  Enter your email to log in or sign up
+                  Enter your details to get started with mental health support
                 </CardDescription>
               </CardHeader>
-              <form onSubmit={handleEmailSubmit}>
+              <form onSubmit={handleCreateAccount}>
                 <CardContent>
-                  
-                  <div className="relative flex items-center gap-2">
-                    <div className="relative flex-1">
-                      <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                  <div className="space-y-4">
+                    <div className="relative">
                       <Input
-                        name="email"
-                        placeholder="name@example.com"
-                        type="email"
-                        className="pl-9"
+                        name="name"
+                        placeholder="Your Name"
+                        type="text"
+                        className="pl-3"
                         disabled={isLoading}
                         required
                       />
                     </div>
-                    <Button
-                      type="submit"
-                      variant="outline"
-                      size="icon"
-                      disabled={isLoading}
-                    >
-                      {isLoading ? (
-                        <Loader2 className="h-4 w-4 animate-spin" />
-                      ) : (
-                        <ArrowRight className="h-4 w-4" />
-                      )}
-                    </Button>
+                    <div className="relative flex items-center gap-2">
+                      <div className="relative flex-1">
+                        <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                        <Input
+                          name="email"
+                          placeholder="name@example.com"
+                          type="email"
+                          className="pl-9"
+                          disabled={isLoading}
+                          required
+                        />
+                      </div>
+                      <Button
+                        type="submit"
+                        variant="outline"
+                        size="icon"
+                        disabled={isLoading}
+                      >
+                        {isLoading ? (
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                        ) : (
+                          <ArrowRight className="h-4 w-4" />
+                        )}
+                      </Button>
+                    </div>
                   </div>
                   {error && (
                     <p className="mt-2 text-sm text-red-500">{error}</p>

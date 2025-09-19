@@ -11,12 +11,18 @@ export const emailOtp = Email({
   },
   async sendVerificationRequest({ identifier: email, provider, token }) {
     try {
+      // Validate email format before sending
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        throw new Error("Invalid email format");
+      }
+
       await axios.post(
         "https://email.vly.ai/send_otp",
         {
           to: email,
           otp: token,
-          appName: process.env.VLY_APP_NAME || "a vly.ai application",
+          appName: process.env.VLY_APP_NAME || "Silent Sanctuary",
         },
         {
           headers: {
@@ -24,8 +30,15 @@ export const emailOtp = Email({
           },
         },
       );
-    } catch (error) {
-      throw new Error(JSON.stringify(error));
+    } catch (error: any) {
+      console.error("Email OTP error:", error);
+      if (error.response) {
+        throw new Error(`Failed to send OTP: ${error.response.data?.message || error.response.statusText}`);
+      } else if (error.request) {
+        throw new Error("Email service is currently unavailable. Please try again later.");
+      } else {
+        throw new Error(error.message || "Failed to send verification email");
+      }
     }
   },
 });
