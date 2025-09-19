@@ -145,7 +145,7 @@ export default function Landing() {
       <CalmBackground
         showVideo={window.innerWidth > 768}
         videoSrc="https://cdn.coverr.co/videos/coverr-a-photographer-in-the-woods-1701/1080p.mp4"
-        posterSrc="https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&w=3840&q=80"
+        posterSrc="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=3840&q=100"
       >
         {/* Hero Section */}
         <section className="pt-32 pb-20 px-4">
