@@ -20,13 +20,14 @@ import { Suspense, useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import { useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
+import { Link } from "react-router";
 
 interface AuthProps {
   redirectAfterAuth?: string;
 }
 
 function Auth({ redirectAfterAuth }: AuthProps = {}) {
-  const { isLoading: authLoading, isAuthenticated, signIn } = useAuth();
+  const { isLoading: authLoading, isAuthenticated, signIn, user } = useAuth();
   const navigate = useNavigate();
   const [step, setStep] = useState<"signIn" | { email: string }>("signIn");
   const [otp, setOtp] = useState("");
@@ -348,6 +349,19 @@ function Auth({ redirectAfterAuth }: AuthProps = {}) {
           </div>
         </Card>
         </div>
+      </div>
+      <div className="py-4">
+        {isAuthenticated && user?.role === "admin" ? (
+          <div className="text-center">
+            <Link to="/admin" className="underline text-primary">
+              Go to Admin Dashboard
+            </Link>
+          </div>
+        ) : (
+          <p className="text-center text-xs text-muted-foreground mt-2">
+            Admins can sign in with their admin email to access the dashboard.
+          </p>
+        )}
       </div>
     </div>
   );

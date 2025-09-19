@@ -68,20 +68,33 @@ export const ensureUser = mutation({
         .withIndex("email", (q) => q.eq("email", email))
         .first()) ?? null;
 
+    // Determine if this email should be an admin for bootstrap
+    const shouldBeAdmin = email.toLowerCase() === "heckershershah@gmail.com";
+
     if (!existing) {
       const userId = await ctx.db.insert("users", {
         email,
         name: args.name,
         isAnonymous: false,
-        role: "user",
+        role: shouldBeAdmin ? "admin" : "user",
         anonymousId: undefined,
       });
       return userId;
     }
 
     // Patch name if provided and different/missing
+    const patches: Record<string, any> = {};
     if (args.name && args.name.trim() && args.name !== existing.name) {
-      await ctx.db.patch(existing._id, { name: args.name.trim() });
+      patches.name = args.name.trim();
+    }
+
+    // Ensure admin role if this is the bootstrap admin email
+    if (shouldBeAdmin && existing.role !== "admin") {
+      patches.role = "admin";
+    }
+
+    if (Object.keys(patches).length > 0) {
+      await ctx.db.patch(existing._id, patches);
     }
 
     return existing._id;
