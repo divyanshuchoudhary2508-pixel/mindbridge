@@ -314,38 +314,6 @@ export default function Landing() {
         {/* Footer */}
         <footer className="py-12 px-4 border-t border-border/50">
           <div className="max-w-7xl mx-auto">
-            <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 bg-gradient-to-br from-primary to-accent rounded-lg flex items-center justify-center">
-                  <Brain className="h-5 w-5 text-primary-foreground" />
-                </div>
-                <span className="font-bold text-lg gradient-text">Anonymous Aid</span>
-              </div>
-              
-              <div className="flex items-center gap-6 text-sm text-muted-foreground">
-                <Link to="/emergency" className="hover:text-foreground transition-colors">
-                  Emergency Support
-                </Link>
-                <Link to="/resources" className="hover:text-foreground transition-colors">
-                  Resources
-                </Link>
-                <Link to="/forum" className="hover:text-foreground transition-colors">
-                  Community
-                </Link>
-              </div>
-
-              {showEmergencyButton && (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={showEmergencyBar}
-                  className="neon-border"
-                >
-                  Show Emergency Bar
-                </Button>
-              )}
-            </div>
-            
             <div className="mt-8 pt-8 border-t border-border/50 text-center text-sm text-muted-foreground">
               <p>© 2024 Anonymous Aid. Providing anonymous mental health support.</p>
               <p className="mt-2">
