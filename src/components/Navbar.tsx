@@ -64,8 +64,8 @@ export default function Navbar() {
             <span className="font-bold text-lg gradient-text -ml-1">Anonymous Aid</span>
           </Link>
 
-          {/* Desktop Navigation - Right side */}
-          <div className="hidden md:flex items-center gap-2 ml-auto">
+          {/* Desktop Navigation - Close to logo */}
+          <div className="hidden md:flex items-center gap-1 ml-8">
             {navigation.map((item) => {
               const Icon = item.icon;
               const isActive = location.pathname === item.href;
@@ -73,7 +73,7 @@ export default function Navbar() {
                 <Link
                   key={item.name}
                   to={item.href}
-                  className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-all duration-200 ${
+                  className={`flex items-center gap-2 px-2 py-2 rounded-lg transition-all duration-200 ${
                     isActive
                       ? "bg-primary/20 text-primary"
                       : "text-muted-foreground hover:text-foreground hover:bg-muted"
@@ -87,7 +87,7 @@ export default function Navbar() {
           </div>
 
           {/* Auth + Theme Section - Far right */}
-          <div className="hidden md:flex items-center gap-4 ml-6">
+          <div className="hidden md:flex items-center gap-4 ml-auto">
             {/* Theme toggle */}
             <Button
               variant="ghost"
