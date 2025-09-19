@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { Link, useLocation } from "react-router";
-import { Menu, X, Brain, MessageCircle, FileText, Users, Calendar, Phone } from "lucide-react";
+import { Menu, X, Brain, MessageCircle, FileText, Users, Calendar, Phone, Sun, Moon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/use-auth";
 
@@ -9,6 +9,38 @@ export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
   const { isAuthenticated, user, signOut } = useAuth();
+
+  // Add: theme state & initialize from localStorage
+  const [isDark, setIsDark] = useState<boolean>(() => {
+    if (typeof window === "undefined") return false;
+    const saved = localStorage.getItem("theme");
+    if (saved === "dark") return true;
+    if (saved === "light") return false;
+    return document.documentElement.classList.contains("dark");
+  });
+
+  // Apply theme on mount and when toggled
+  if (typeof window !== "undefined") {
+    const root = document.documentElement;
+    if (isDark) {
+      root.classList.add("dark");
+    } else {
+      root.classList.remove("dark");
+    }
+  }
+
+  const toggleTheme = () => {
+    const next = !isDark;
+    setIsDark(next);
+    const root = document.documentElement;
+    if (next) {
+      root.classList.add("dark");
+      localStorage.setItem("theme", "dark");
+    } else {
+      root.classList.remove("dark");
+      localStorage.setItem("theme", "light");
+    }
+  };
 
   const navigation = [
     { name: "Home", href: "/", icon: Brain },
@@ -54,8 +86,18 @@ export default function Navbar() {
             })}
           </div>
 
-          {/* Auth Section */}
+          {/* Auth + Theme Section (Desktop) */}
           <div className="hidden md:flex items-center gap-4">
+            {/* Add: Theme toggle */}
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={toggleTheme}
+              aria-label="Toggle theme"
+            >
+              {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+            </Button>
+
             {isAuthenticated ? (
               <div className="flex items-center gap-3">
                 <span className="text-sm text-muted-foreground">
@@ -98,6 +140,21 @@ export default function Navbar() {
         className="md:hidden overflow-hidden bg-card border-t border-border"
       >
         <div className="px-4 py-4 space-y-2">
+          {/* Add: Theme toggle (Mobile) */}
+          <div className="flex justify-end pb-2">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => {
+                toggleTheme();
+                setIsOpen(false);
+              }}
+              aria-label="Toggle theme"
+            >
+              {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+            </Button>
+          </div>
+          
           {navigation.map((item) => {
             const Icon = item.icon;
             const isActive = location.pathname === item.href;
