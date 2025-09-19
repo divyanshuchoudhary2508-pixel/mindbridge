@@ -56,43 +56,41 @@
   --popover: oklch(0.99 0.003 95);
   --popover-foreground: oklch(0.22 0.03 95);
 
-  /* Primary: modern blue */
-  --primary: oklch(0.6 0.18 255);
+  /* Minimal, modern palette */
+  --primary: oklch(0.55 0.08 255);
   --primary-foreground: oklch(0.98 0 0);
 
-  /* Secondary: soft slate */
-  --secondary: oklch(0.92 0.02 250);
-  --secondary-foreground: oklch(0.28 0.03 250);
+  --secondary: oklch(0.94 0.01 250);
+  --secondary-foreground: oklch(0.28 0.02 250);
 
-  --muted: oklch(0.95 0.01 95);
-  --muted-foreground: oklch(0.5 0.02 95);
+  --muted: oklch(0.97 0.005 95);
+  --muted-foreground: oklch(0.45 0.015 95);
 
-  /* Accent: fresh emerald */
-  --accent: oklch(0.7 0.12 155);
+  --accent: oklch(0.68 0.06 155);
   --accent-foreground: oklch(0.2 0.02 155);
 
   --destructive: oklch(0.6 0.2 25);
 
-  --border: oklch(0.9 0.01 95);
-  --input: oklch(0.94 0.01 95);
-  --ring: oklch(0.6 0.18 255);
+  --border: oklch(0.92 0.006 95);
+  --input: oklch(0.96 0.006 95);
+  --ring: oklch(0.55 0.08 255);
 
-  /* Charts */
-  --chart-1: oklch(0.6 0.18 255);
-  --chart-2: oklch(0.66 0.13 160);
-  --chart-3: oklch(0.7 0.12 35);
-  --chart-4: oklch(0.58 0.14 310);
-  --chart-5: oklch(0.62 0.16 70);
+  /* Charts (subtle) */
+  --chart-1: oklch(0.55 0.08 255);
+  --chart-2: oklch(0.64 0.07 160);
+  --chart-3: oklch(0.66 0.06 35);
+  --chart-4: oklch(0.56 0.07 310);
+  --chart-5: oklch(0.6 0.07 70);
 
-  /* Sidebar */
-  --sidebar: oklch(0.98 0.01 95);
-  --sidebar-foreground: oklch(0.22 0.03 95);
-  --sidebar-primary: oklch(0.6 0.18 255);
+  /* Sidebar (subtle) */
+  --sidebar: oklch(0.99 0.004 95);
+  --sidebar-foreground: oklch(0.22 0.02 95);
+  --sidebar-primary: oklch(0.55 0.08 255);
   --sidebar-primary-foreground: oklch(0.98 0 0);
-  --sidebar-accent: oklch(0.95 0.01 95);
-  --sidebar-accent-foreground: oklch(0.22 0.03 95);
-  --sidebar-border: oklch(0.9 0.01 95);
-  --sidebar-ring: oklch(0.6 0.18 255);
+  --sidebar-accent: oklch(0.97 0.005 95);
+  --sidebar-accent-foreground: oklch(0.22 0.02 95);
+  --sidebar-border: oklch(0.92 0.006 95);
+  --sidebar-ring: oklch(0.55 0.08 255);
 }
 
 /* Dark mode counterpart tuned for readability and parity with light accents */
@@ -106,38 +104,40 @@
   --popover: oklch(0.1 0 0);
   --popover-foreground: oklch(0.96 0 0);
 
-  --primary: oklch(0.7 0.16 255);
+  --primary: oklch(0.68 0.08 255);
   --primary-foreground: oklch(0.06 0 0);
 
-  --secondary: oklch(0.22 0.02 250);
+  --secondary: oklch(0.2 0.01 250);
   --secondary-foreground: oklch(0.96 0 0);
 
-  --muted: oklch(0.16 0.01 95);
-  --muted-foreground: oklch(0.7 0.02 95);
+  --muted: oklch(0.14 0.005 95);
+  --muted-foreground: oklch(0.7 0.015 95);
 
-  --accent: oklch(0.7 0.12 155);
+  --accent: oklch(0.7 0.06 155);
   --accent-foreground: oklch(0.06 0 0);
 
   --destructive: oklch(0.62 0.22 25);
 
-  --border: oklch(0.2 0.005 95);
-  --input: oklch(0.16 0.01 95);
-  --ring: oklch(0.7 0.16 255);
+  --border: oklch(0.18 0.004 95);
+  --input: oklch(0.16 0.005 95);
+  --ring: oklch(0.68 0.08 255);
 
-  --chart-1: oklch(0.7 0.16 255);
-  --chart-2: oklch(0.68 0.12 160);
-  --chart-3: oklch(0.72 0.12 35);
-  --chart-4: oklch(0.64 0.14 310);
-  --chart-5: oklch(0.66 0.14 70);
+  /* Charts (subtle) */
+  --chart-1: oklch(0.68 0.08 255);
+  --chart-2: oklch(0.66 0.07 160);
+  --chart-3: oklch(0.7 0.06 35);
+  --chart-4: oklch(0.62 0.07 310);
+  --chart-5: oklch(0.64 0.07 70);
 
+  /* Sidebar (subtle) */
   --sidebar: oklch(0.1 0 0);
   --sidebar-foreground: oklch(0.96 0 0);
-  --sidebar-primary: oklch(0.7 0.16 255);
+  --sidebar-primary: oklch(0.68 0.08 255);
   --sidebar-primary-foreground: oklch(0.06 0 0);
-  --sidebar-accent: oklch(0.14 0.01 95);
+  --sidebar-accent: oklch(0.14 0.005 95);
   --sidebar-accent-foreground: oklch(0.96 0 0);
-  --sidebar-border: oklch(0.2 0.005 95);
-  --sidebar-ring: oklch(0.7 0.16 255);
+  --sidebar-border: oklch(0.18 0.004 95);
+  --sidebar-ring: oklch(0.68 0.08 255);
 }
 
 @layer base {
@@ -173,7 +173,9 @@
 }
 
 .glow {
-  animation: glow 2s ease-in-out infinite;
+  /* disable glow animations and shadows */
+  animation: none;
+  box-shadow: none;
 }
 
 .float {
@@ -185,9 +187,10 @@
 }
 
 .neon-border {
-  border: 1px solid;
-  border-image: linear-gradient(45deg, #00ff88, #0088ff, #ff0080) 1;
-  box-shadow: 0 0 10px rgba(0, 255, 136, 0.3);
+  /* remove gradient border and glow */
+  border: 1px solid var(--border);
+  border-image: none;
+  box-shadow: none;
 }
 
 .gradient-text {
