@@ -12,9 +12,9 @@ import { Shield, BarChart3 } from "lucide-react";
 export default function AdminDashboard() {
   const { isAuthenticated, user } = useAuth();
 
-  const analytics = useQuery(api.admin.getAnalytics, {});
-
+  // Only run the analytics query when the user is an admin
   const isAdmin = !!user && user.role === "admin";
+  const analytics = useQuery(api.admin.getAnalytics, isAdmin ? {} : undefined);
 
   return (
     <div className="min-h-screen bg-background">
