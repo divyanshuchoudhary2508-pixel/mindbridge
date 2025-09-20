@@ -109,11 +109,12 @@ export const createUser = mutation({
     isAnonymous: v.optional(v.boolean()),
   },
   handler: async (ctx, args) => {
-    // Check if user already exists
-    const existingUser = await ctx.db
-      .query("users")
-      .filter((q) => q.eq(q.field("email"), args.email))
-      .first();
+    // Check if user already exists (use indexed lookup)
+    const existingUser =
+      (await ctx.db
+        .query("users")
+        .withIndex("email", (q) => q.eq("email", args.email))
+        .first()) ?? null;
     
     if (existingUser) {
       throw new Error("User with this email already exists");
@@ -132,14 +133,16 @@ export const createUser = mutation({
   },
 });
 
-// Get user by email
+// Get user by email (use indexed lookup)
 export const getUserByEmail = query({
   args: { email: v.string() },
   handler: async (ctx, args) => {
-    return await ctx.db
-      .query("users")
-      .filter((q) => q.eq(q.field("email"), args.email))
-      .first();
+    return (
+      (await ctx.db
+        .query("users")
+        .withIndex("email", (q) => q.eq("email", args.email))
+        .first()) ?? null
+    );
   },
 });
 
