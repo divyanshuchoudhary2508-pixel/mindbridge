@@ -1,44 +1,42 @@
 import { useState } from "react";
-import { useAuth } from "@/hooks/use-auth";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import AdminHeader from "@/pages/admin/AdminHeader";
-import DashboardTab from "@/pages/admin/DashboardTab";
-import ForumTab from "@/pages/admin/ForumTab";
-import SettingsTab from "@/pages/admin/SettingsTab";
+import AdminHeader from "./admin/AdminHeader";
+import DashboardTab from "./admin/DashboardTab";
+import ForumTab from "./admin/ForumTab";
+import SettingsTab from "./admin/SettingsTab";
+import Navbar from "@/components/Navbar";
+import { useQuery } from "convex/react";
+import { api } from "@/convex/_generated/api";
 
 export default function AdminDashboard() {
-  const { isAuthenticated, user } = useAuth();
   const [activeTab, setActiveTab] = useState<"dashboard" | "forum" | "settings">("dashboard");
 
+  const user = useQuery(api.users.currentUser, {});
+  const isLoadingUser = user === undefined;
   const isAdmin =
-    !!user &&
-    (user.role === "admin" ||
-      (user.email && user.email.toLowerCase() === "heckershershah@gmail.com"));
+    !!user && (user.role === "admin" || (user.email || "").toLowerCase() === "heckershershah@gmail.com");
 
   return (
-    <div className="min-h-screen bg-background">
-      <AdminHeader activeTab={activeTab} onChangeTab={setActiveTab} />
-      <div className="pt-6 pb-12 px-4">
-        <div className="max-w-7xl mx-auto space-y-6">
-          {!isAuthenticated ? (
-            <Alert>
-              <AlertTitle>Authentication required</AlertTitle>
-              <AlertDescription>
-                Please sign in with an admin account to access the admin module.
-              </AlertDescription>
-            </Alert>
-          ) : user == null ? (
-            <Alert>
-              <AlertTitle>Loading admin session…</AlertTitle>
-              <AlertDescription>Verifying access</AlertDescription>
-            </Alert>
+    <div className="min-h-screen">
+      <Navbar />
+
+      <div className="pt-16">
+        <AdminHeader activeTab={activeTab} onChangeTab={setActiveTab} />
+
+        <main className="mx-auto max-w-7xl px-4 py-6">
+          {isLoadingUser ? (
+            <div className="bg-card/80 backdrop-blur-sm rounded-lg border p-6">
+              <h2 className="text-lg font-semibold mb-1">Loading admin session…</h2>
+              <p className="text-sm text-muted-foreground">
+                Verifying your admin access. This usually takes a moment.
+              </p>
+            </div>
           ) : !isAdmin ? (
-            <Alert>
-              <AlertTitle>Access denied</AlertTitle>
-              <AlertDescription>
-                You don't have permission to view this section. Ask an existing admin to grant access.
-              </AlertDescription>
-            </Alert>
+            <div className="bg-card/80 backdrop-blur-sm rounded-lg border p-6">
+              <h2 className="text-lg font-semibold mb-1">Access denied</h2>
+              <p className="text-sm text-muted-foreground">
+                You need admin privileges to view this page.
+              </p>
+            </div>
           ) : (
             <>
               {activeTab === "dashboard" && <DashboardTab />}
@@ -46,7 +44,7 @@ export default function AdminDashboard() {
               {activeTab === "settings" && <SettingsTab />}
             </>
           )}
-        </div>
+        </main>
       </div>
     </div>
   );

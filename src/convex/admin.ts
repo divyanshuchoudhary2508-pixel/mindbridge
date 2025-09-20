@@ -1,60 +1,83 @@
 import { query } from "./_generated/server";
 import { getCurrentUser } from "./users";
 
+type AnalyticsPayload = {
+  totalAssessments: number;
+  byType: Record<string, { avgScore: number; count: number }>;
+  riskDistribution: Record<string, number>;
+  recent: Array<{ assessmentType: string; score: number }>;
+};
+
+const EMPTY_ANALYTICS: AnalyticsPayload = {
+  totalAssessments: 0,
+  byType: {},
+  riskDistribution: {},
+  recent: [],
+};
+
 export const getAnalytics = query({
   args: {},
   handler: async (ctx) => {
     const user = await getCurrentUser(ctx);
-    // Allow access if role is admin OR email matches bootstrap admin
-    const isBootstrapAdmin = !!user?.email && user.email.toLowerCase() === "heckershershah@gmail.com";
-    if (!user || (user.role !== "admin" && !isBootstrapAdmin)) {
-      return {
-        totalAssessments: 0,
-        byType: {},
-        riskDistribution: {},
-        recent: [],
+
+    // Only admins or the bootstrap email can access analytics.
+    const isAdmin =
+      !!user &&
+      (user.role === "admin" ||
+        (user.email || "").toLowerCase() === "heckershershah@gmail.com");
+
+    // During auth transitions or for non-admin users, return empty payload.
+    if (!isAdmin) {
+      return EMPTY_ANALYTICS;
+    }
+
+    // Recent scores (last 20)
+    const recentDocs = await ctx.db
+      .query("assessmentResults")
+      .order("desc")
+      .take(20);
+    const recent: AnalyticsPayload["recent"] = recentDocs.map((d) => ({
+      assessmentType: d.assessmentType,
+      score: d.score,
+    }));
+
+    // Aggregate across all assessment results
+    let totalAssessments = 0;
+    const typeAgg: Record<
+      string,
+      { sum: number; count: number }
+    > = Object.create(null);
+    const riskAgg: Record<string, number> = Object.create(null);
+
+    for await (const row of ctx.db.query("assessmentResults")) {
+      totalAssessments += 1;
+
+      // by type
+      const t = row.assessmentType;
+      if (!typeAgg[t]) typeAgg[t] = { sum: 0, count: 0 };
+      typeAgg[t].sum += row.score;
+      typeAgg[t].count += 1;
+
+      // risk distribution
+      const r = row.riskLevel;
+      riskAgg[r] = (riskAgg[r] || 0) + 1;
+    }
+
+    const byType: AnalyticsPayload["byType"] = {};
+    for (const [type, { sum, count }] of Object.entries(typeAgg)) {
+      byType[type] = {
+        avgScore: count ? sum / count : 0,
+        count,
       };
     }
 
-    // Aggregate assessment results
-    const results = await ctx.db.query("assessmentResults").collect();
-
-    let totalAssessments = 0;
-    let byType: Record<string, { count: number; totalScore: number; avgScore: number }> = {};
-    let riskDistribution: Record<string, number> = {};
-    const recentScores: Array<{ assessmentType: string; score: number; _creationTime: number }> = [];
-
-    for (const r of results) {
-      totalAssessments++;
-      // by type
-      if (!byType[r.assessmentType]) {
-        byType[r.assessmentType] = { count: 0, totalScore: 0, avgScore: 0 };
-      }
-      byType[r.assessmentType].count += 1;
-      byType[r.assessmentType].totalScore += r.score;
-      // risk
-      riskDistribution[r.riskLevel] = (riskDistribution[r.riskLevel] || 0) + 1;
-      // recent trends (keep last 50)
-      recentScores.push({
-        assessmentType: r.assessmentType,
-        score: r.score,
-        _creationTime: r._creationTime,
-      });
-    }
-
-    for (const key of Object.keys(byType)) {
-      const t = byType[key];
-      t.avgScore = t.count > 0 ? Number((t.totalScore / t.count).toFixed(2)) : 0;
-    }
-
-    recentScores.sort((a, b) => b._creationTime - a._creationTime);
-    const recent = recentScores.slice(0, 20);
+    const riskDistribution: AnalyticsPayload["riskDistribution"] = riskAgg;
 
     return {
       totalAssessments,
       byType,
       riskDistribution,
       recent,
-    };
+    } satisfies AnalyticsPayload;
   },
 });
