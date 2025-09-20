@@ -50,7 +50,16 @@ export const editPost = mutation({
       throw new Error("You can only edit your own posts");
     }
 
-    await ctx.db.patch(args.postId, { content: args.content.trim() });
+    const trimmed = args.content.trim();
+    if (!trimmed) {
+      throw new Error("Content is required");
+    }
+
+    // Update both content and title to stay consistent
+    await ctx.db.patch(args.postId, { 
+      content: trimmed,
+      title: trimmed.slice(0, 80) || "Post",
+    });
   },
 });
 
