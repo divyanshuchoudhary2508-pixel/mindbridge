@@ -22,6 +22,9 @@ export default function ForumTab() {
     return v;
   }, []);
 
+  const user = useQuery(api.users.currentUser, {});
+  const isAdmin = !!user && (user.role === "admin" || (user.email || "").toLowerCase() === "heckershershah@gmail.com");
+
   const posts = useQuery(api.forum.listPosts, {});
   const createPost = useMutation(api.forum.createPost);
   const editPost = useMutation(api.forum.editPost);
@@ -83,6 +86,7 @@ export default function ForumTab() {
           {posts.map((p) => {
             const isMine = p.anonymousId === anon;
             const isEditing = editingId === String(p._id);
+            const canManage = isAdmin || isMine;
             return (
               <Card key={p._id} className="border-0 shadow-sm hover:shadow-md transition">
                 <CardContent className="p-4 space-y-2">
@@ -145,7 +149,7 @@ export default function ForumTab() {
                     {p.isAnonymous ? "Anonymous" : "User"}
                   </div>
 
-                  {isMine && !isEditing && (
+                  {canManage && !isEditing && (
                     <div className="pt-2 flex items-center gap-2">
                       <Button
                         size="sm"

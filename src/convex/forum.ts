@@ -42,11 +42,15 @@ export const editPost = mutation({
     if (!post) throw new Error("Post not found");
 
     const user = await getCurrentUser(ctx);
+    const isAdmin =
+      !!user &&
+      (user.role === "admin" || (user.email || "").toLowerCase() === "heckershershah@gmail.com");
+
     const isOwner =
       (post.userId && user?._id && post.userId === user._id) ||
       post.anonymousId === args.anonymousId;
 
-    if (!isOwner) {
+    if (!isOwner && !isAdmin) {
       throw new Error("You can only edit your own posts");
     }
 
@@ -73,11 +77,15 @@ export const deletePost = mutation({
     if (!post) throw new Error("Post not found");
 
     const user = await getCurrentUser(ctx);
+    const isAdmin =
+      !!user &&
+      (user.role === "admin" || (user.email || "").toLowerCase() === "heckershershah@gmail.com");
+
     const isOwner =
       (post.userId && user?._id && post.userId === user._id) ||
       post.anonymousId === args.anonymousId;
 
-    if (!isOwner) {
+    if (!isOwner && !isAdmin) {
       throw new Error("You can only delete your own posts");
     }
 
