@@ -1,7 +1,6 @@
 import { mutation, query } from "./_generated/server";
+import type { QueryCtx, MutationCtx } from "./_generated/server";
 import { v } from "convex/values";
-import { internal } from "./_generated/api";
-import type { MutationCtx, QueryCtx } from "./_generated/server";
 
 // Helper to get the currently authenticated user's document (or null)
 // Used by other Convex functions (reviews, forum, chatbot, assessments)
@@ -72,13 +71,15 @@ export const ensureUser = mutation({
     const shouldBeAdmin = email.toLowerCase() === "heckershershah@gmail.com";
 
     if (!existing) {
-      const userId = await ctx.db.insert("users", {
+      const newUser: Record<string, any> = {
         email,
-        name: args.name,
         isAnonymous: false,
         role: shouldBeAdmin ? "admin" : "user",
-        anonymousId: undefined,
-      });
+      };
+      if (args.name && args.name.trim()) {
+        newUser.name = args.name.trim();
+      }
+      const userId = await ctx.db.insert("users", newUser);
       return userId;
     }
 
@@ -121,13 +122,18 @@ export const createUser = mutation({
     }
 
     // Create new user
-    const userId = await ctx.db.insert("users", {
+    const doc: Record<string, any> = {
       email: args.email,
-      name: args.name,
-      isAnonymous: args.isAnonymous || false,
+      isAnonymous: !!args.isAnonymous,
       role: "user",
-      anonymousId: args.isAnonymous ? `anon_${Date.now()}_${Math.random().toString(36).substr(2, 9)}` : undefined,
-    });
+    };
+    if (args.name && args.name.trim()) {
+      doc.name = args.name.trim();
+    }
+    if (args.isAnonymous) {
+      doc.anonymousId = `anon_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`;
+    }
+    const userId = await ctx.db.insert("users", doc);
 
     return userId;
   },
@@ -154,9 +160,11 @@ export const updateUserProfile = mutation({
     image: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
-    await ctx.db.patch(args.userId, {
-      name: args.name,
-      image: args.image,
-    });
+    const updates: Record<string, any> = {};
+    if (args.name !== undefined) updates.name = args.name;
+    if (args.image !== undefined) updates.image = args.image;
+    if (Object.keys(updates).length > 0) {
+      await ctx.db.patch(args.userId, updates);
+    }
   },
 });
