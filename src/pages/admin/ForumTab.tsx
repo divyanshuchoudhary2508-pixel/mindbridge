@@ -4,6 +4,7 @@ import { api } from "@/convex/_generated/api";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { toast } from "sonner";
+import { Badge } from "@/components/ui/badge";
 
 export default function ForumTab() {
   const [postText, setPostText] = useState("");
@@ -30,7 +31,12 @@ export default function ForumTab() {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h2 className="text-xl md:text-2xl font-bold">Community Forum</h2>
-        <div className="text-sm text-muted-foreground">Latest 50 posts</div>
+        <div className="flex items-center gap-2">
+          <span className="text-sm text-muted-foreground">Latest 50 posts</span>
+          <Badge variant="secondary" className="text-xs">
+            {posts ? posts.length : 0}
+          </Badge>
+        </div>
       </div>
 
       <div className="bg-card/80 backdrop-blur-sm rounded-lg border p-4">
