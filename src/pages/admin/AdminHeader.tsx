@@ -15,7 +15,7 @@ export default function AdminHeader({ activeTab, onChangeTab }: Props) {
             <BarChart3 className="h-5 w-5" />
           </div>
           <div>
-            <div className="text-sm text-muted-foreground leading-tight">Silent Sanctuary</div>
+            <div className="text-sm text-muted-foreground leading-tight">MindBridge</div>
             <h1 className="text-lg font-semibold leading-tight">Admin Console</h1>
           </div>
         </div>

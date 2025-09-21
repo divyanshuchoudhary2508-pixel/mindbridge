@@ -70,7 +70,7 @@ export default function Navbar() {
             <div className="w-8 h-8 bg-gradient-to-br from-primary to-accent rounded-lg flex items-center justify-center">
               <Brain className="h-5 w-5 text-primary-foreground" />
             </div>
-            <span className="font-bold text-lg gradient-text -ml-1">Silent Sanctuary</span>
+            <span className="font-bold text-lg gradient-text -ml-1">MindBridge</span>
           </Link>
 
           {/* Desktop Navigation - Close to logo */}
