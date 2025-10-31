@@ -17,9 +17,33 @@ import { Calendar as CalendarIcon } from "lucide-react";
 import { Link } from "react-router";
 
 export default function Appointments() {
-  const { isAuthenticated, user } = useAuth();
+  const { isAuthenticated, user, isLoading } = useAuth();
 
-  const listMine = useQuery(api.appointments.listMine, {});
+  // Get or create anonymous ID
+  const [anonymousId] = useState(() => {
+    if (typeof window === "undefined") return "";
+    const key = "anonymousId";
+    let id = localStorage.getItem(key);
+    if (!id) {
+      id = `anon_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;
+      localStorage.setItem(key, id);
+    }
+    return id;
+  });
+
+  // Fetch appointments based on auth status
+  const listMineAuth = useQuery(
+    api.appointments.listMine,
+    isAuthenticated && user?._id ? {} : "skip"
+  );
+  const listMineAnon = useQuery(
+    api.appointments.listByAnonymousId,
+    !isAuthenticated || !user?._id ? { anonymousId } : "skip"
+  );
+
+  // Combine results
+  const listMine = isAuthenticated && user?._id ? listMineAuth : listMineAnon;
+
   const create = useMutation(api.appointments.create);
   const cancel = useMutation(api.appointments.cancel);
   const reschedule = useMutation(api.appointments.reschedule);
@@ -43,10 +67,6 @@ export default function Appointments() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!isAuthenticated) {
-      toast.error("Please sign in to book an appointment.");
-      return;
-    }
     if (!date || !time || !reason.trim()) {
       toast.error("Please select a date, time, and enter a reason.");
       return;
@@ -61,6 +81,7 @@ export default function Appointments() {
         counselorEmail: selected && selected.value !== "none" ? selected.email : undefined,
         reason: reason.trim(),
         contact: contact.trim() || undefined,
+        anonymousId: anonymousId,
       });
       toast.success("Your appointment request has been submitted successfully.");
       // Reset form (keep counselor for convenience)
@@ -112,17 +133,18 @@ export default function Appointments() {
               <CardDescription>Connect with licensed mental health professionals.</CardDescription>
             </CardHeader>
             <CardContent>
-              {!isAuthenticated ? (
-                <div className="p-4 border rounded-md text-sm bg-muted">
-                  Please{" "}
-                  <Link to="/auth" className="underline text-primary">
-                    sign in
-                  </Link>{" "}
-                  to book an appointment.
+              {!isAuthenticated && (
+                <div className="p-4 border rounded-md text-sm bg-muted/50 mb-4">
+                  <p className="text-muted-foreground">
+                    You're booking as a guest. For better tracking, consider{" "}
+                    <Link to="/auth" className="underline text-primary font-medium">
+                      signing in with an email account
+                    </Link>.
+                  </p>
                 </div>
-              ) : null}
+              )}
 
-              <form onSubmit={handleSubmit} className="mt-4 space-y-6">
+              <form onSubmit={handleSubmit} className="space-y-6">
                 {/* Date and Time */}
                 <div className="grid md:grid-cols-2 gap-4">
                   <div className="flex flex-col gap-2">
@@ -133,7 +155,6 @@ export default function Appointments() {
                           type="button"
                           variant="outline"
                           className="justify-start w-full"
-                          disabled={!isAuthenticated}
                         >
                           <CalendarIcon className="mr-2 h-4 w-4" />
                           {date ? format(date, "PPP") : "Pick a date"}
@@ -155,7 +176,8 @@ export default function Appointments() {
                       type="time"
                       value={time}
                       onChange={(e) => setTime(e.target.value)}
-                      disabled={!isAuthenticated}
+                      className="cursor-pointer"
+                      placeholder="Select time"
                     />
                   </div>
                 </div>
@@ -166,7 +188,6 @@ export default function Appointments() {
                   <Select
                     value={counselor}
                     onValueChange={setCounselor}
-                    disabled={!isAuthenticated}
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="Select counselor (optional)" />
@@ -189,7 +210,6 @@ export default function Appointments() {
                     onChange={(e) => setReason(e.target.value)}
                     placeholder="Tell us briefly about the reason for this appointment..."
                     className="min-h-[120px]"
-                    disabled={!isAuthenticated}
                   />
                 </div>
 
@@ -200,11 +220,10 @@ export default function Appointments() {
                     placeholder="Phone or email"
                     value={contact}
                     onChange={(e) => setContact(e.target.value)}
-                    disabled={!isAuthenticated}
                   />
                 </div>
 
-                <Button type="submit" disabled={!isAuthenticated || submitting}>
+                <Button type="submit" disabled={submitting}>
                   {submitting ? "Submitting..." : "Submit Request"}
                 </Button>
               </form>
@@ -218,9 +237,7 @@ export default function Appointments() {
               <CardDescription>Recent appointment requests</CardDescription>
             </CardHeader>
             <CardContent>
-              {!isAuthenticated ? (
-                <p className="text-sm text-muted-foreground">Sign in to view your appointments.</p>
-              ) : listMine === undefined ? (
+              {listMine === undefined ? (
                 <p className="text-sm text-muted-foreground">Loading...</p>
               ) : listMine.length === 0 ? (
                 <p className="text-sm text-muted-foreground">No appointments yet.</p>

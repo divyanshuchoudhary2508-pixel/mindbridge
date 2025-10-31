@@ -7,10 +7,30 @@ export const listMine = query({
   args: {},
   handler: async (ctx) => {
     const user = await getCurrentUser(ctx);
-    if (!user?._id) return [];
+    
+    // For authenticated users, fetch by userId
+    if (user?._id) {
+      const rows = await ctx.db
+        .query("appointments")
+        .withIndex("by_user_id", (q) => q.eq("userId", user._id))
+        .order("desc")
+        .collect();
+      return rows;
+    }
+    
+    // For anonymous users, we can't fetch from backend without passing anonymousId
+    // Return empty array - frontend will handle this differently
+    return [];
+  },
+});
+
+// New query: List appointments by anonymous ID
+export const listByAnonymousId = query({
+  args: { anonymousId: v.string() },
+  handler: async (ctx, args) => {
     const rows = await ctx.db
       .query("appointments")
-      .withIndex("by_user_id", (q) => q.eq("userId", user._id))
+      .filter((q) => q.eq(q.field("anonymousId"), args.anonymousId))
       .order("desc")
       .collect();
     return rows;
@@ -26,19 +46,22 @@ export const create = mutation({
     counselorEmail: v.optional(v.string()),
     reason: v.string(),
     contact: v.optional(v.string()),
+    anonymousId: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     const user = await getCurrentUser(ctx);
-    if (!user?._id) {
-      throw new Error("You must be signed in to book an appointment.");
-    }
+    
+    // Allow both authenticated users and anonymous users
+    const userId = user?._id;
+    const anonymousId = args.anonymousId || undefined;
 
     if (!args.date || !args.time || !args.reason.trim()) {
       throw new Error("Date, time, and reason are required.");
     }
 
     const id = await ctx.db.insert("appointments", {
-      userId: user._id,
+      userId: userId,
+      anonymousId: anonymousId,
       professionalName: args.counselorName ?? "",
       professionalEmail: args.counselorEmail ?? "",
       date: args.date,

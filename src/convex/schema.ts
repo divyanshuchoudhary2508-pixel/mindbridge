@@ -104,7 +104,8 @@ const schema = defineSchema(
 
     // Appointments with professionals
     appointments: defineTable({
-      userId: v.id("users"),
+      userId: v.optional(v.id("users")),
+      anonymousId: v.optional(v.string()),
       professionalName: v.string(),
       professionalEmail: v.string(),
       date: v.string(),
